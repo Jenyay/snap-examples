@@ -19,7 +19,3 @@ parts:
     # See 'snapcraft plugins'
     plugin: dump
     source: .
-    # override-build: |
-    #     snapcraftctl build
-    #     cp $SNAPCRAFT_PART_SRC/testsnap.sh $SNAPCRAFT_PART_INSTALL/usr/bin/
-    #     chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/testsnap.sh
