@@ -1,0 +1,28 @@
+name: testsnap-py # you probably want to 'snapcraft register <name>'
+version: '0.2' # just for humans, typically '1.2+git' or '1.3.2'
+summary: Single-line elevator pitch for your amazing snap # 79 char long summary
+description: |
+  This is my-snap's description. You have a paragraph or two to tell the
+  most important story about your snap. Keep it under 100 words though,
+  we live in tweetspace and your description wants to look good in the snap
+  store.
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+apps:
+    testsnap-py:
+        command: python3 $SNAP/usr/bin/testsnap.py
+
+parts:
+  testsnap-py:
+    # See 'snapcraft plugins'
+    plugin: python
+    python-version: python3
+    source: .
+    python-packages:
+        - colorama
+    override-build: |
+        snapcraftctl build
+        cp $SNAPCRAFT_PART_SRC/testsnap.py $SNAPCRAFT_PART_INSTALL/usr/bin/
+        chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/testsnap.py
