@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import wx
+from wx.html2 import WebView
 
 
 class MyTestFrame(wx.Frame):
     def __init__(self, parent, title):
-        super().__init__(parent, wx.ID_ANY, title, size=(400, 150))
-        self._listCtrl = wx.ListCtrl(self, style=wx.LC_LIST)
-
-        for n in range(20):
-            self._listCtrl.InsertItem(0, 'bla-bla-bla-bla-bla')
+        super().__init__(parent, wx.ID_ANY, title, size=(600, 500))
+        self._browser = WebView.New(self)
+        self._browser.LoadURL('https://jenyay.net')
 
         self.Show()
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import wx
-import wx.adv
 
 
 class MyTestFrame(wx.Frame):
