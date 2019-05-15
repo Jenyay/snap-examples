@@ -1,0 +1,119 @@
+name: testsnap-py # you probably want to 'snapcraft register <name>'
+version: '0.5.2' # just for humans, typically '1.2+git' or '1.3.2'
+summary: Single-line elevator pitch for your amazing snap # 79 char long summary
+description: |
+  This is my-snap's description. You have a paragraph or two to tell the
+  most important story about your snap. Keep it under 100 words though,
+  we live in tweetspace and your description wants to look good in the snap
+  store.
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+# base: core
+
+passthrough:
+    layout:
+        /usr/libexec/webkit2gtk-4.0:
+            bind: $SNAP/usr/libexec/webkit2gtk-4.0
+        /usr/lib/webkit2gtk-4.0/injected-bundle:
+            bind: $SNAP/usr/lib/webkit2gtk-4.0/injected-bundle
+
+apps:
+    testsnap-py:
+        command: desktop-launch python3 $SNAP/usr/bin/testsnap.py
+        plugs: [x11, unity7, pulseaudio, home, gsettings, network, network-bind]
+        environment:
+            LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/pulseaudio
+
+parts:
+    testsnap-py:
+        # See 'snapcraft plugins'
+        plugin: python
+        python-version: python3
+        source: .
+        stage-packages:
+            # - libc6
+            - libssl-dev
+            - libjpeg-dev
+            - libtiff-dev
+            - libsdl1.2-dev
+            - libnotify-dev
+            - freeglut3
+            - ibus-gtk3
+            - zlib1g
+            - libsm6
+            - libpulse0
+        after:
+            - webkitgtk
+            - desktop-gtk3
+        python-packages:
+            - https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04/wxPython-4.0.4-cp35-cp35m-linux_x86_64.whl
+        override-build: |
+            snapcraftctl build
+            cp $SNAPCRAFT_PART_SRC/testsnap.py $SNAPCRAFT_PART_INSTALL/usr/bin/
+            chmod +x $SNAPCRAFT_PART_INSTALL/usr/bin/testsnap.py
+
+    webkitgtk:
+        after:
+            - gcc
+        plugin: cmake
+        configflags:
+            - -DCMAKE_INSTALL_PREFIX=/
+            - -DCMAKE_BUILD_TYPE=Release
+            - -DPORT=GTK
+            - -DENABLE_WEB_CRYPTO=0
+            - -DUSE_OPENJPEG=0
+            - -DUSE_WOFF2=0
+            - -DUSE_GSTREAMER_GL=0
+            - -DENABLE_MEDIA_SOURCE=0
+            # - -DENABLE_INDEXED_DATABASE=0
+            # - -DENABLE_INDEXED_DATABASE_IN_WORKERS=0
+            - -DCMAKE_C_COMPILER=gcc-6
+            - -DCMAKE_CXX_COMPILER=g++-6
+        source: https://www.webkitgtk.org/releases/webkitgtk-2.24.1.tar.xz
+        build-packages:
+            - ruby
+            - libgcrypt20-dev
+            - libwebp-dev
+            - libxslt1-dev
+            - libsecret-1-dev
+            - libtasn1-6-dev
+            - libenchant-dev
+            - libhyphen-dev
+            # - libopenjp2-7-dev
+            - libjpeg-dev
+            - libsoup2.4-dev
+            - libxkbcommon-dev
+            - libnghttp2-14
+            - libpixman-1-dev
+            - libsqlite3-dev
+            - libgl1-mesa-dev
+            - freeglut3-dev 
+            - libgirepository1.0-dev
+            - libgtk-3-dev
+            - libgtk2.0-dev
+            - libnotify-dev
+            - libgstreamer1.0-dev
+            - libgstreamer-plugins-base1.0-dev
+        stage-packages:
+            - libc6
+            - libstdc++6
+            - libgl1
+            - libgles2
+            - geoclue-2.0
+            - gperf
+            - gobject-introspection
+
+    gcc:
+        plugin: nil
+        override-pull: 'true'
+        override-build: |
+            sudo apt --yes install software-properties-common
+
+            # Install newer GCC from Toolchain test builds PPA
+            sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+            sudo apt update
+            sudo apt --yes install gcc-6 g++-6
+
+        override-stage: 'true'
+        override-prime: 'true'
